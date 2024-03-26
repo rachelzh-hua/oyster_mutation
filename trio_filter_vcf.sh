@@ -16,6 +16,8 @@ REF='/path/to/reference/ref.fasta'
 DATAOUT='path/to/sequencing_data/trio_files'
 mkdir $DATAOUT
 
+cd $DATAOUT
+
 gatk CombineGVCFs \
 -R $REF \
 -V $DATAOUT/${subdir1}/${subdir1}.g.vcf.gz \
