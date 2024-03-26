@@ -44,6 +44,7 @@ If more memories are required, see [IndelRealigner_highmem.sh](IndelRealigner_hi
        zcat combine.all.output_filtered.vcf.gz | grep -v "#" |cut -f4 | awk 'length > 2' | wc -l
 Report number of variants, number of SNPs and other types of variants.
 ### 10. Combine trio and variant calling 
+	sbatch trio_filter_vcf.sh
 ### 11. Filter vcf files
       vcftools --vcf ${subdir}.trio.filtered.vcf  --remove-indels  \
       --min-alleles 2 --max-alleles 2 --max-missing 1 --minDP 50 --minQ 30  \
