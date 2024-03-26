@@ -18,7 +18,7 @@ vcftools
 The entire pipeline is run on bash, R and python.
 
 ### 1. Download all [fastq files](https://www.ncbi.nlm.nih.gov/bioproject/566001)
-      They are stored in directory [path/to/sequencing_data/fastq].
+      They are stored in directory [path/to/sequencing_data/fastq_files].
 ### 2. Download [reference genome](https://www.ncbi.nlm.nih.gov/assembly/GCA_902806645.1)
       They are stored in directory [path/to/sequencing_data/reference].
 ### 3. Alignment and variant calling.
@@ -28,17 +28,20 @@ The second bash scripts need to be run on SLURM as they can run for upwards to w
 The maximum run time for SLURM is 168 hours. If necessary, the second scripts can be break up into several parts and run consecutively. 
 If more memories are required, see [IndelRealigner_highmem.sh](IndelRealigner_highmem.sh) for example.
 ### 4. Combine gvcf
+	sbatch CombineGVCFs.sh
 ### 5. Perform joint genotyping on all samples pre-called with HaplotypeCaller
+	sbatch GenotypeGVCFs.sh
 ### 6. Export different parameters 
-	zcat output.vcf.gz | grep -v '##' |head -40| cut -f8 | grep -o 'QD=[0-9]*\.[0-9]*'
+	zcat combine.all.output.vcf.gz | grep -v '##' |head -40| cut -f8 | grep -o 'QD=[0-9]*\.[0-9]*'
 ### 7. Show histograms of different parameters 
  	Rscript histogram_parameters.R
 ### 8. Filter variants based on histograms 
+	sbatch VariantFiltration.sh
 ### 9. Report variants
-       zcat output_filtered.vcf.gz  | grep -v "##" | wc -l
-       zcat output_filtered.vcf.gz  | grep -v "#" |cut -f4 | awk 'length == 1' | wc -l
-       zcat output_filtered.vcf.gz  | grep -v "#" |cut -f4 | awk 'length == 2' | wc -l
-       zcat output_filtered.vcf.gz  | grep -v "#" |cut -f4 | awk 'length > 2' | wc -l
+       zcat combine.all.output_filtered.vcf.gz | grep -v "##" | wc -l
+       zcat combine.all.output_filtered.vcf.gz | grep -v "#" |cut -f4 | awk 'length == 1' | wc -l
+       zcat combine.all.output_filtered.vcf.gz | grep -v "#" |cut -f4 | awk 'length == 2' | wc -l
+       zcat combine.all.output_filtered.vcf.gz | grep -v "#" |cut -f4 | awk 'length > 2' | wc -l
 Report number of variants, number of SNPs and other types of variants.
 ### 10. Combine trio and variant calling 
 ### 11. Filter vcf files
