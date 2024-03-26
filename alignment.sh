@@ -1,7 +1,7 @@
-DATADIR='/project/noujdine_61/rachelh/oyster/sequencing_data/fastq_files'
-REF='/project/noujdine_61/rachelh/oyster/sequencing_data/reference/GCA_902806645.1.fasta'
+DATADIR='path/to/sequencing_data/fastq_files'
+REF='path/to/sequencing_data/reference/ref.fasta'
 
-DATAOUT='/project/noujdine_61/rachelh/oyster/sequencing_data/bwa_output_files'
+DATAOUT='path/to/sequencing_data/bwa_output_files'
 mkdir $DATAOUT
 
 for f in  $DATADIR/*.1.fastq.gz; do
@@ -11,7 +11,7 @@ for f in  $DATADIR/*.1.fastq.gz; do
 	cat <<-EoF > ./${subdir}.sh
 	#!/bin/bash
 	
-	#SBATCH --account=noujdine_61
+	#SBATCH --account={account_name}
 	#SBATCH --partition=oneweek
 	#SBATCH --nodes=1
 	#SBATCH --ntasks=1
@@ -21,18 +21,18 @@ for f in  $DATADIR/*.1.fastq.gz; do
 	
 	module purge
 	eval "\$(conda shell.bash hook)"
-	conda activate /project/noujdine_61/rachelh/env/gatk4
+	conda activate /path/to/env/gatk4
 	
 	module load gcc/8.3.0
 	module load openjdk/1.8.0_202-b08 
 	module load samtools
 	module load bwa
 	module load picard
-	
-	DATADIR='/project/noujdine_61/rachelh/oyster/sequencing_data/fastq_files'
-	REF='/project/noujdine_61/rachelh/oyster/sequencing_data/reference/GCA_902806645.1.fasta'
-	
-	DATAOUT='/project/noujdine_61/rachelh/oyster/sequencing_data/output_files'
+ 
+	DATADIR='path/to/sequencing_data/fastq_files'
+	REF='path/to/sequencing_data/reference/ref.fasta'
+
+	DATAOUT='path/to/sequencing_data/bwa_output_files'
 	mkdir -p $DATAOUT/$subdir
 	
 	bwa aln -t 12 -R 8 $REF $DATADIR/${subdir}.1.fastq.gz > $DATAOUT/$subdir/${subdir}.1.sai
@@ -44,13 +44,18 @@ for f in  $DATADIR/*.1.fastq.gz; do
 	
 	picard MarkDuplicates -I $DATAOUT/$subdir/${subdir}_alignment_bwa.sort.bam -O $DATAOUT/$subdir/${subdir}_alignment.marked_duplicates.bam -M  $DATAOUT/$subdir/${subdir}_marked_dup_metrics.txt --REMOVE_DUPLICATES true --VALIDATION_STRINGENCY LENIENT 
 
-	java -jar /project/noujdine_61/rachelh/env/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
-    -T RealignerTargetCreator \
-    -R  $REF  \
-    -I  $DATAOUT/$subdir/${subdir}_alignment.marked_duplicates.bam \
-	    -o  $DATAOUT/$subdir/${subdir}_realignertargetcreator.intervals
+	java -jar /path/to/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
+    	-T RealignerTargetCreator \
+    	-R  $REF  \
+    	-I  $DATAOUT/$subdir/${subdir}_alignment.marked_duplicates.bam \
+	-o  $DATAOUT/$subdir/${subdir}_realignertargetcreator.intervals
 
-	java -jar /project/noujdine_61/rachelh/env/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar   -T IndelRealigner -R  $REF -targetIntervals $DATAOUT/$subdir/{subdir}_realignertargetcreator.intervals -I   $DATAOUT/$subdir/${subdir}_alignment_bwa.sort.bam -o  $DATAOUT/$subdir/${subdir}_indelrealigner.bam
+	java -jar /path/toGenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
+ 	-T IndelRealigner \
+  	-R $REF \
+   	-targetIntervals $DATAOUT/$subdir/{subdir}_realignertargetcreator.intervals \
+    	-I   $DATAOUT/$subdir/${subdir}_alignment_bwa.sort.bam \
+     	-o  $DATAOUT/$subdir/${subdir}_indelrealigner.bam
 	
 	picard  FixMateInformation I= $DATAOUT/$subdir/${subdir}_test.indelrealigner.bam O=$DATAOUT/$subdir/${subdir}_fixed_mate.bam VALIDATION_STRINGENCY=SILENT 
 
