@@ -29,43 +29,48 @@ The maximum run time for SLURM is 168 hours. If necessary, the second scripts ca
 If more memories are required, see [IndelRealigner_highmem.sh](IndelRealigner_highmem.sh) for example.
 ### 4. Combine gvcf
 ### 5. Perform joint genotyping on all samples pre-called with HaplotypeCaller
-### 6. Export and show histograms of different parameters  
-### 7. Filter variants based on histograms 
-### 8. Report variants
+### 6. Export different parameters 
+	zcat output.vcf.gz | grep -v '##' |head -40| cut -f8 | grep -o 'QD=[0-9]*\.[0-9]*'
+### 7. Show histograms of different parameters 
+ 	Rscript histogram_parameters.R
+### 8. Filter variants based on histograms 
+### 9. Report variants
        zcat output_filtered.vcf.gz  | grep -v "##" | wc -l
        zcat output_filtered.vcf.gz  | grep -v "#" |cut -f4 | awk 'length == 1' | wc -l
        zcat output_filtered.vcf.gz  | grep -v "#" |cut -f4 | awk 'length == 2' | wc -l
        zcat output_filtered.vcf.gz  | grep -v "#" |cut -f4 | awk 'length > 2' | wc -l
 Report number of variants, number of SNPs and other types of variants.
-### 9. Combine trio and variant calling 
-### 10. Filter vcf files
+### 10. Combine trio and variant calling 
+### 11. Filter vcf files
       vcftools --vcf ${subdir}.trio.filtered.vcf  --remove-indels  \
       --min-alleles 2 --max-alleles 2 --max-missing 1 --minDP 50 --minQ 30  \
       --recode --stdout | zip -c  > ${subdir}.trio.DP50.vcf
-### 11. Convert trio.vcf files into 012 format 
+### 12. Convert trio.vcf files into 012 format 
       vcftools --vcf ${subdir}.trio.DP50.recode.vcf --012 --out vcftools --vcf ${subdir}.trio.DP50.recode.vcf --012
-### 12. Tabulate non-mutant/het mutant/false progeny mutant
+### 13. Tabulate non-mutant/het mutant/false progeny mutant
       python find_mutation.py
 output tables: \
 path/to/${subdir}/${subdir}.DP50_merge.csv \
 path/to/${subdir}/${subdir}.DP50_mut.csv \
 path/to/${subdir}/${subdir}.DP50_false.csv \
 path/to/${subdir}/${subdir}.DP50_het_mut.csv 
-### 13. Subset vcf files to only  heterozygous de novo mutation
+### 14. Subset vcf files to only  heterozygous de novo mutation
       python find_pos.py
       vcftools --vcf ${subdir}.trio.DP50.vcf --positions ${subdir}.DP50.info.csv  --recode --stdout  >  ${subdir}.trio.DP50.het_mut.vcf
-### 14. Download SnpEff for SNP annotation
+### 15. Download SnpEff for SNP annotation
 See [this](https://github.com/kdews/s-latissima-mutation-annotation/tree/main) for reference. 
-### 15. SnpEff build database
+### 16. SnpEff build database
 	java -jar snpEff.jar build -gtf22 -v cgigas -noCheckCds -noCheckProtein
-### 16. SNP annotation
+### 17. SNP annotation
 	java -Xmx8g -jar /path/to/snpEff/snpEff.jar cgigas \
  	/path/to/sequencing_data/${subdir}/${subdir}.trio.DP50.het_mut.vcf > /path/to/sequencing_data/${subdir}/${subdir}.trio.DP50.het_mut.ann.vcf
-### 17. Find types of SNPs in annotation files
+### 18. Find types of SNPs in annotation files
 	grep -c HIGH ${subdir}.trio.DP50.het_mut.ann.vcf
  	grep -c missense_variant ${subdir}.trio.DP50.het_mut.ann.vcf
   	grep -c synonymous_variant ${subdir}.trio.DP50.het_mut.ann.vcf
-### 18. Additional filter 
+### 19. Additional filter 
+	Rscript additional_filter.R
+ 
 
 
 
