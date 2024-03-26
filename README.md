@@ -47,22 +47,25 @@ Report number of variants, number of SNPs and other types of variants.
 ### 12. Tabulate non-mutant/het mutant/false progeny mutant
       python find_mutation.py
 output tables: \
-path/to/{subdir}.DP50_merge.csv \
-path/to/{subdir}.DP50_mut.csv \
-path/to/{subdir}.DP50_false.csv \
-path/to/{subdir}.DP50_het_mut.csv 
+path/to/${subdir}/${subdir}.DP50_merge.csv \
+path/to/${subdir}/${subdir}.DP50_mut.csv \
+path/to/${subdir}/${subdir}.DP50_false.csv \
+path/to/${subdir}/${subdir}.DP50_het_mut.csv 
 ### 13. Subset vcf files to only  heterozygous de novo mutation
       python find_pos.py
-	vcftools --vcf ${subdir}.trio.DP50.vcf --positions ${subdir}.DP50.info.csv  --recode --stdout  >  ${subdir}.trio.DP50.het_mut.vcf
-### 14. SnpEff build database
-See [this](https://github.com/kdews/s-latissima-mutation-annotation/tree/main) for reference.
-      i. 
-
-
-
-
-
-
+      vcftools --vcf ${subdir}.trio.DP50.vcf --positions ${subdir}.DP50.info.csv  --recode --stdout  >  ${subdir}.trio.DP50.het_mut.vcf
+### 14. Download SnpEff for SNP annotation
+See [this](https://github.com/kdews/s-latissima-mutation-annotation/tree/main) for reference. 
+### 15. SnpEff build database
+	java -jar snpEff.jar build -gtf22 -v cgigas -noCheckCds -noCheckProtein
+### 16. SNP annotation
+	java -Xmx8g -jar /path/to/snpEff/snpEff.jar cgigas \
+ 	/path/to/sequencing_data/${subdir}/${subdir}.trio.DP50.het_mut.vcf > /path/to/sequencing_data/${subdir}/${subdir}.trio.DP50.het_mut.ann.vcf
+### 17. Find types of SNPs in annotation files
+	grep -c HIGH ${subdir}.trio.DP50.het_mut.ann.vcf
+ 	grep -c missense_variant ${subdir}.trio.DP50.het_mut.ann.vcf
+  	grep -c synonymous_variant ${subdir}.trio.DP50.het_mut.ann.vcf
+### 18. Additional filter 
 
 
 
