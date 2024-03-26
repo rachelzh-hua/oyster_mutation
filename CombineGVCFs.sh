@@ -12,8 +12,8 @@ module purge
 eval "$(conda shell.bash hook)"
 conda activate /path/to/env/gatk4
 
-REF='/path/to/reference/GCA_902806645.1.fasta'
-DATAOUT='path/to/sequencing_data/bwa_output_files'
+REF='/path/to/reference/ref.fasta'
+DATAOUT='path/to/sequencing_data/vcf_output_files'
 
 gatk CombineGVCFs \
 -R $REF \
