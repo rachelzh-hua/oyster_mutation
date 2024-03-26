@@ -20,7 +20,7 @@ gatk CombineGVCFs \
 -V $DATAOUT/${subdir1}/${subdir1}.g.vcf.gz \
 -V $DATAOUT/${subdir...}/${subdir...}.g.v \
 ...
--V $DATAOUT/${subdir...}/${subdir...}.g.vcf.gz \cf.gz \
+-V $DATAOUT/${subdir...}/${subdir...}.g.vcf.gz \
 -V $DATAOUT/${subdir_n}/${subdir_n}.g.vcf.gz \
 -O $DATAOUT/combine.all.g.vcf.gz
 
