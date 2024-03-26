@@ -22,5 +22,5 @@ gatk CombineGVCFs \
 ...
 -V $DATAOUT/${subdir...}/${subdir...}.g.vcf.gz \cf.gz \
 -V $DATAOUT/${subdir_n}/${subdir_n}.g.vcf.gz \
--O $DATAOUT/combine.trio.g.vcf.gz
+-O $DATAOUT/combine.all.g.vcf.gz
 
