@@ -11,7 +11,7 @@ samtools \
 bwa \
 picard \
 GATK4 \
-[gatk3](#gatk3)
+[GATK3](#gatk)
 
 ## Running the pipeline
 ### 1. Download all [fastq files](https://www.ncbi.nlm.nih.gov/bioproject/566001)
@@ -20,10 +20,8 @@ GATK4 \
       They are stored in directory [path/to/sequencing_data/reference].
 
       
+## <a name="gatk">GATK</a>
 
-
-
-#GATK3 \
 GATK4 has changed the workflow of variant calling using the new version of [HaplotypeCaller](https://github.com/broadinstitute/gatk-docs/blob/master/blog-2012-to-2019/2016-06-21-Changing_workflows_around_calling_SNPs_and_indels.md?id=7847). Indel realignment using RealignerTargetCreator and IndelRealigner has since been omitted from GATK4. 
 For the purpose of this project, we performed indel realignment before base quality score recalibration (BQSR) and after duplicate marking using GATK3.
 Older versions of GATK and documents can be found [here](https://github.com/broadinstitute/gatk-docs).
