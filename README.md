@@ -43,36 +43,54 @@ If more memories are required, see [IndelRealigner_highmem.sh](IndelRealigner_hi
        zcat combine.all.output_filtered.vcf.gz | grep -v "#" |cut -f4 | awk 'length == 2' | wc -l
        zcat combine.all.output_filtered.vcf.gz | grep -v "#" |cut -f4 | awk 'length > 2' | wc -l
 Report number of variants, number of SNPs and other types of variants.
-### 10. Combine trio and variant calling 
+### 10. Quality control on all samples. 
+	1. Calculate Nei's genetic distance.
+ 		Rscript nei_genetic_distance.R
+		sbatch nei_R_script.sh
+ 	2. ADMIXTURE
+  		Download ADMIXTURE software
+    		/path/to/admixture_linux-1.3.0/admixture
+      		
+		plink --vcf combine.all.output_filtered.vcf.gz --make-bed --out all_combined.plink --double-id --allow-extra-chr
+		(may need to filter out missing data first)
+  		> save all output files(.bam/.bed/.fam) in one directory
+  		
+    		sbatch admixture.sh
+
+  	3. PCA plot
+   		plink --bfile all_combined.plink --pca 10 --out all_combine.pca --allow-extra-chr
+     		Rscript PCA_plot.R
+
+### 11. Combine trio and variant calling 
 	sbatch trio_filter_vcf.sh
-### 11. Filter vcf files
+### 12. Filter vcf files
       vcftools --vcf ${subdir}.trio.filtered.vcf  --remove-indels  \
       --min-alleles 2 --max-alleles 2 --max-missing 1 --minDP 50 --minQ 30  \
       --recode --stdout | zip -c  > ${subdir}.trio.DP50.vcf
-### 12. Convert trio.vcf files into 012 format 
+### 13. Convert trio.vcf files into 012 format 
       vcftools --vcf ${subdir}.trio.DP50.recode.vcf --012 --out vcftools --vcf ${subdir}.trio.DP50.recode.vcf --012
-### 13. Tabulate non-mutant/het mutant/false progeny mutant
+### 14. Tabulate non-mutant/het mutant/false progeny mutant
       python find_mutation.py
 output tables: \
 path/to/${subdir}/${subdir}.DP50_merge.csv \
 path/to/${subdir}/${subdir}.DP50_mut.csv \
 path/to/${subdir}/${subdir}.DP50_false.csv \
 path/to/${subdir}/${subdir}.DP50_het_mut.csv 
-### 14. Subset vcf files to only  heterozygous de novo mutation
+### 15. Subset vcf files to only  heterozygous de novo mutation
       python find_pos.py
       vcftools --vcf ${subdir}.trio.DP50.vcf --positions ${subdir}.DP50.info.csv  --recode --stdout  >  ${subdir}.trio.DP50.het_mut.vcf
-### 15. Download SnpEff for SNP annotation
+### 16. Download SnpEff for SNP annotation
 See [this](https://github.com/kdews/s-latissima-mutation-annotation/tree/main) for reference. 
-### 16. SnpEff build database
+### 17. SnpEff build database
 	java -jar snpEff.jar build -gtf22 -v cgigas -noCheckCds -noCheckProtein
-### 17. SNP annotation
+### 18. SNP annotation
 	java -Xmx8g -jar /path/to/snpEff/snpEff.jar cgigas \
  	/path/to/sequencing_data/${subdir}/${subdir}.trio.DP50.het_mut.vcf > /path/to/sequencing_data/${subdir}/${subdir}.trio.DP50.het_mut.ann.vcf
-### 18. Find types of SNPs in annotation files
+### 19. Find types of SNPs in annotation files
 	grep -c HIGH ${subdir}.trio.DP50.het_mut.ann.vcf
  	grep -c missense_variant ${subdir}.trio.DP50.het_mut.ann.vcf
   	grep -c synonymous_variant ${subdir}.trio.DP50.het_mut.ann.vcf
-### 19. Additional filter 
+### 20. Additional filter 
 	Rscript additional_filter.R
  
 
