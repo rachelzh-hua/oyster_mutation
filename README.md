@@ -56,6 +56,7 @@ Report number of variants, number of SNPs and other types of variants.
   		> save all output files(.bam/.bed/.fam) in one directory
   		
     		sbatch admixture.sh
+      		Rscript admixture.R
 
   	3. PCA plot
    		plink --bfile all_combined.plink --pca 10 --out all_combine.pca --allow-extra-chr
@@ -90,8 +91,18 @@ See [this](https://github.com/kdews/s-latissima-mutation-annotation/tree/main) f
 	grep -c HIGH ${subdir}.trio.DP50.het_mut.ann.vcf
  	grep -c missense_variant ${subdir}.trio.DP50.het_mut.ann.vcf
   	grep -c synonymous_variant ${subdir}.trio.DP50.het_mut.ann.vcf
-### 20. Additional filter 
+### 20. Find repeated regions using RepeatMasker
+	awk '/^>.*scaffold/{flag=1;next}/^>/{flag=0}flag==0' GCA_902806645.1.fasta > GCA_902806645.1.cleaned.fasta
+ 	sbatch repeatmasker.sh
+  	awk '{print $5 "\t" $6-1 "\t" $7}' your_repeatmasker.out > repeat_regions.bed
+### 21. Filter SNPs out from repeated regions 
+	bedtools intersect -v -a ${subdir}.trio.DP50.het_mut.ann.vcf -b /path/to/repeat_region.bed  > ${subdir}.trio.DP50.het_mut.norepeat.vcf
+### 22. Additional filter 
 	Rscript additional_filter.R
+
+
+
+
  
 
 
