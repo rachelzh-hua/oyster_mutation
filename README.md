@@ -12,7 +12,10 @@ bwa \
 picard \
 GATK4 \
 [GATK3](#gatk)\
-vcftools
+vcftools \
+plink \
+ADMIXTURE \
+RepeatMasker
 
 ## Running the pipeline
 The entire pipeline is run on bash, R and python.
