@@ -36,7 +36,7 @@ If more memories are required, see [IndelRealigner_highmem.sh](IndelRealigner_hi
 	sbatch GenotypeGVCFs.sh
 ### 6. Export different parameters 
 	zcat combine.all.output.vcf.gz | grep -v '##' |head -40| cut -f8 | grep -o 'QD=[0-9]*\.[0-9]*'
-### 7. Show histograms of different parameters 
+### 7. Visualize histograms of different parameters 
  	Rscript histogram_parameters.R
 ### 8. Filter variants based on histograms 
 	sbatch VariantFiltration.sh
